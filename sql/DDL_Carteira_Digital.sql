@@ -46,7 +46,7 @@ CREATE TABLE MOEDA (
 CREATE TABLE SALDO_CARTEIRA (
     endereco_carteira VARCHAR(255) NOT NULL,
     id_moeda SMALLINT NOT NULL,
-    saldo DECIMAL(18, 8) NOT NULL, -- Assumindo precisão alta para moedas
+    saldo DECIMAL(18, 8) NOT NULL default 0.0, -- Assumindo precisão alta para moedas
     data_atualizacao DATETIME NOT NULL,
     PRIMARY KEY (endereco_carteira, id_moeda),
     FOREIGN KEY (endereco_carteira) REFERENCES CARTEIRA(endereco_carteira),
@@ -54,13 +54,13 @@ CREATE TABLE SALDO_CARTEIRA (
 );
 
 CREATE TABLE DEPOSITO_SAQUE (
-    id_movimento BIGINT NOT NULL,
+    id_movimento BIGINT NOT NULL AUTO_INCREMENT,
     endereco_carteira VARCHAR(255) NOT NULL,
     id_moeda SMALLINT NOT NULL,
     tipo ENUM('DEPOSITO', 'SAQUE') NOT NULL,
     valor DECIMAL(18, 8) NOT NULL,
     taxa_valor DECIMAL(18, 8) NOT NULL,
-    data_hora DATETIME NOT NULL,
+    data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id_movimento),
     FOREIGN KEY (endereco_carteira) REFERENCES CARTEIRA(endereco_carteira),
     FOREIGN KEY (id_moeda) REFERENCES MOEDA(id_moeda)
@@ -113,3 +113,15 @@ INSERT INTO MOEDA (id_moeda, codigo, nome, tipo) VALUES
 -- ALTER TABLE carteira
 --     MODIFY data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 --     MODIFY status ENUM('ATIVA','BLOQUEADA') NOT NULL DEFAULT 'ATIVA';
+
+ALTER TABLE saldo_carteira
+    MODIFY data_atualizacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE conversao
+    MODIFY id_conversao BIGINT NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE conversao
+    MODIFY data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE transferencia
+    MODIFY id_transferencia BIGINT NOT NULL AUTO_INCREMENT;
