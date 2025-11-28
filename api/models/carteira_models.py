@@ -2,9 +2,6 @@ from typing import Literal, List
 from datetime import datetime
 from pydantic import BaseModel
 
-# -------------------------
-# MODELOS EXISTENTES
-# -------------------------
 class Carteira(BaseModel):
     endereco_carteira: str
     data_criacao: datetime
@@ -13,10 +10,6 @@ class Carteira(BaseModel):
 class CarteiraCriada(Carteira):
     chave_privada: str
 
-
-# -------------------------
-# SALDOS
-# -------------------------
 class Saldo(BaseModel):
     saldo: float
     moeda_codigo: str
@@ -26,34 +19,21 @@ class SaldosCarteira(BaseModel):
     endereco: str
     saldos: List[Saldo]
 
-
-# -------------------------
-# DEPOSITO / SAQUE
-# -------------------------
 class DepositoRequest(BaseModel):
     id_moeda: int
     valor: float
     chave_privada: str
-
 
 class SaqueRequest(BaseModel):
     id_moeda: int
     valor: float
     chave_privada: str
 
-
-# -------------------------
-# CONVERSÃO
-# -------------------------
 class ConversaoRequest(BaseModel):
     id_moeda_origem: int
     id_moeda_destino: int
     valor_origem: float
 
-
-# -------------------------
-# TRANSFERÊNCIA
-# -------------------------
 class TransferenciaRequest(BaseModel):
     endereco_destino: str
     id_moeda: int

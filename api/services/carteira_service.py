@@ -17,10 +17,6 @@ class CarteiraService:
     def __init__(self, carteira_repo: CarteiraRepository):
         self.carteira_repo = carteira_repo
 
-    # ------------------------------------------------------
-    # JÁ EXISTENTES — NÃO ALTEREI NADA
-    # ------------------------------------------------------
-
     def criar_carteira(self) -> CarteiraCriada:
         row = self.carteira_repo.criar()
         return CarteiraCriada(
@@ -63,10 +59,6 @@ class CarteiraService:
             status=row["status"],
         )
 
-    # ------------------------------------------------------
-    # ADIÇÕES — APENAS O NECESSÁRIO
-    # ------------------------------------------------------
-
     def obter_saldos(self, endereco: str):
         carteira = self.carteira_repo.buscar_por_endereco(endereco)
         if not carteira:
@@ -95,9 +87,6 @@ class CarteiraService:
         )
 
     def realizar_conversao(self, endereco_carteira: str, req: ConversaoRequest):
-        """
-        Converte uma moeda para outra.
-        """
         return self.carteira_repo.converter(
             endereco_carteira,
             req.id_moeda_origem,
@@ -106,9 +95,6 @@ class CarteiraService:
         )
 
     def realizar_transferencia(self, endereco_origem: str, req: TransferenciaRequest):
-        """
-        Transfere saldo entre carteiras.
-        """
         return self.carteira_repo.transferir(
             endereco_origem,
             req.endereco_destino,

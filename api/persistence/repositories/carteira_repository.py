@@ -48,6 +48,7 @@ class CarteiraRepository:
         carteira["chave_privada"] = chave_privada      
         return carteira
 
+
     def popular_saldos(self, endereco_carteira: str):
         with get_connection() as conn:
             conn.execute(
@@ -62,6 +63,7 @@ class CarteiraRepository:
                 {"endereco": endereco_carteira},
             )
     
+
     def buscar_por_endereco(self, endereco_carteira: str) -> Optional[Dict[str, Any]]:
         with get_connection() as conn:
             row = conn.execute(
@@ -78,6 +80,7 @@ class CarteiraRepository:
 
         return dict(row) if row else None
 
+
     def listar(self) -> List[Dict[str, Any]]:
         with get_connection() as conn:
             rows = conn.execute(
@@ -91,6 +94,7 @@ class CarteiraRepository:
             ).mappings().all()
 
         return [dict(r) for r in rows]
+
 
     def atualizar_status(self, endereco_carteira: str, status: str) -> Optional[Dict[str, Any]]:
         with get_connection() as conn:
@@ -117,6 +121,7 @@ class CarteiraRepository:
 
         return dict(row) if row else None
 
+
     def listar_saldos(self, endereco: str):
             with get_connection() as conn:
                 rows = conn.execute(
@@ -134,6 +139,7 @@ class CarteiraRepository:
 
             return [dict(r) for r in rows]
 
+
     def validar_chave(self, endereco, chave_privada):
         hash_input = hashlib.sha256(chave_privada.encode()).hexdigest()
 
@@ -150,9 +156,7 @@ class CarteiraRepository:
 
         return row is not None
 
-    # -------------------------------------------------------------
-    # DEPÓSITO
-    # -------------------------------------------------------------
+    
     def depositar(self, endereco, moeda, valor, chave_privada):
         if not self.validar_chave(endereco, chave_privada):
             raise ValueError("Chave privada inválida")
@@ -178,10 +182,8 @@ class CarteiraRepository:
             )
 
         return {"status": "OK", "novo_saldo": self.obter_saldo(endereco, moeda)}
+    
 
-    # -------------------------------------------------------------
-    # SAQUE
-    # -------------------------------------------------------------
     def sacar(self, endereco, moeda, valor, chave_privada):
         if not self.validar_chave(endereco, chave_privada):
             raise ValueError("Chave privada inválida")
@@ -190,7 +192,7 @@ class CarteiraRepository:
         taxa_valor = valor * Decimal("0.02")
         total = valor + taxa_valor
 
-        saldo_atual = self.obter_saldo(endereco, moeda)  # já vem como Decimal
+        saldo_atual = self.obter_saldo(endereco, moeda)
         if saldo_atual < total:
             raise ValueError("Saldo insuficiente")
 
@@ -216,9 +218,7 @@ class CarteiraRepository:
 
         return {"status": "OK", "novo_saldo": saldo_atual - total}
 
-    # -------------------------------------------------------------
-    # SALDO INDIVIDUAL
-    # -------------------------------------------------------------
+
     def obter_saldo(self, endereco, moeda):
         with get_connection() as conn:
             row = conn.execute(
@@ -233,16 +233,15 @@ class CarteiraRepository:
 
         return row["saldo"]
     
+
     def converter(self, endereco, id_moeda_origem, id_moeda_destino, valor_origem):
         from decimal import Decimal
         valor_origem = Decimal(valor_origem)
 
-        # 1. Obter saldo atual
         saldo_origem = self.obter_saldo(endereco, id_moeda_origem)
         if saldo_origem < valor_origem:
             raise ValueError("Saldo insuficiente para conversão")
 
-        # 2. Buscar cotação na Coinbase
         codigo_origem = self.get_codigo_moeda(id_moeda_origem)
         codigo_destino = self.get_codigo_moeda(id_moeda_destino)
 
@@ -252,13 +251,11 @@ class CarteiraRepository:
         data = resp.json()
         cotacao = Decimal(data["data"]["rates"][codigo_destino])
 
-        # 3. Calcular valores
         valor_destino = valor_origem * cotacao
         taxa_percentual = Decimal("0.02")
         taxa_valor = valor_destino * taxa_percentual
         valor_destino_final = valor_destino - taxa_valor
 
-        # 4. Atualizar saldos
         with get_connection() as conn:
             conn.execute(
                 text("UPDATE saldo_carteira SET saldo = saldo - :valor WHERE endereco_carteira=:endereco AND id_moeda=:moeda"),
@@ -288,6 +285,7 @@ class CarteiraRepository:
 
         return {"status": "OK", "valor_convertido": str(valor_destino_final)}
 
+
     def get_codigo_moeda(self, id_moeda: int) -> str:
         with get_connection() as conn:
             row = conn.execute(
@@ -312,7 +310,6 @@ class CarteiraRepository:
             raise ValueError("Saldo insuficiente na origem")
 
         with get_connection() as conn:
-            # Debitar origem
             conn.execute(
                 text("""
                     UPDATE saldo_carteira
@@ -322,7 +319,6 @@ class CarteiraRepository:
                 {"total": total, "endereco": endereco_origem, "moeda": id_moeda}
             )
 
-            # Creditar destino
             conn.execute(
                 text("""
                     UPDATE saldo_carteira
@@ -332,7 +328,6 @@ class CarteiraRepository:
                 {"valor": valor, "endereco": endereco_destino, "moeda": id_moeda}
             )
 
-            # Registrar transferência
             conn.execute(
                 text("""
                     INSERT INTO transferencia (endereco_origem, endereco_destino, id_moeda, valor, taxa_valor, data_hora)
