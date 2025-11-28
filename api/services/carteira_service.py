@@ -1,3 +1,4 @@
+
 from typing import List
 
 from api.persistence.repositories.carteira_repository import CarteiraRepository

@@ -31,8 +31,8 @@ USE wallet_homolog;
 CREATE TABLE CARTEIRA (
     endereco_carteira VARCHAR(255) NOT NULL,
     hash_chave_privada VARCHAR(255) NOT NULL,
-    data_criacao DATETIME NOT NULL,
-    status ENUM('ATIVA', 'BLOQUEADA') NOT NULL,
+    MODIFY data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('ATIVA','BLOQUEADA') NOT NULL DEFAULT 'ATIVA',
     PRIMARY KEY (endereco_carteira)
 );
 
@@ -110,7 +110,6 @@ INSERT INTO MOEDA (id_moeda, codigo, nome, tipo) VALUES
 
 -- O tipo 'Cripto' e 'Fiduciária' são exemplos. Ajuste conforme necessário.
 
-ALTER TABLE carteira
-    MODIFY data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    MODIFY status ENUM('ATIVA','BLOQUEADA') NOT NULL DEFAULT 'ATIVA';
-
+-- ALTER TABLE carteira
+--     MODIFY data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     MODIFY status ENUM('ATIVA','BLOQUEADA') NOT NULL DEFAULT 'ATIVA';

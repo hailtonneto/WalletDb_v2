@@ -1,30 +1,20 @@
-from pydantic import BaseModel
+from typing import Literal, List
 from datetime import datetime
-from typing import Optional
-
-class Saldo(BaseModel):
-    moeda: str
-    quantidade: float
-
-class OperacaoValor(BaseModel):
-    valor: float
-    moeda: str
-
-class Conversao(BaseModel):
-    moeda_origem: str
-    moeda_destino: str
-    valor: float
-
-class Transferencia(BaseModel):
-    destino: str
-    valor: float
-    moeda: str
+from pydantic import BaseModel, Field
 
 class Carteira(BaseModel):
-    endereco: str
+    endereco_carteira: str
     data_criacao: datetime
-    status: str
+    status: Literal["ATIVA", "BLOQUEADA"] 
 
-class CarteiraCriada(BaseModel):
+class CarteiraCriada(Carteira):
+    chave_privada: str # Campo adicional que só é retornado na criação
+
+class Saldo(BaseModel):
+    saldo: float
+    moeda_codigo: str
+    moeda_nome: str
+
+class SaldosCarteira(BaseModel):
     endereco: str
-    chave_privada: str
+    saldos: List[Saldo]

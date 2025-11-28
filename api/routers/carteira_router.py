@@ -33,58 +33,23 @@ def listar_carteiras(service: CarteiraService = Depends(get_carteira_service)):
     return service.listar()
 
 
-@router.get("/{endereco_carteira}/saldos")
-def listar_saldos(
+@router.get("/{endereco_carteira}", response_model=Carteira)
+def buscar_carteira(
     endereco_carteira: str,
-    service: CarteiraService = Depends(get_carteira_service)
+    service: CarteiraService = Depends(get_carteira_service),
 ):
     try:
-        return service.listar_saldos(endereco_carteira)
+        return service.buscar_por_endereco(endereco_carteira)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/{endereco_carteira}/depositos")
-def depositar(
+@router.delete("/{endereco_carteira}", response_model=Carteira)
+def bloquear_carteira(
     endereco_carteira: str,
-    dados: OperacaoValor,
-    service: CarteiraService = Depends(get_carteira_service)
+    service: CarteiraService = Depends(get_carteira_service),
 ):
-    return service.depositar(endereco_carteira, dados.valor, dados.moeda)
-
-
-@router.post("/{endereco_carteira}/saques")
-def sacar(
-    endereco_carteira: str,
-    dados: OperacaoValor,
-    service: CarteiraService = Depends(get_carteira_service)
-):
-    return service.sacar(endereco_carteira, dados.valor, dados.moeda)
-
-
-@router.post("/{endereco_carteira}/conversoes")
-def converter(
-    endereco_carteira: str,
-    dados: Conversao,
-    service: CarteiraService = Depends(get_carteira_service)
-):
-    return service.converter(
-        endereco_carteira,
-        dados.moeda_origem,
-        dados.moeda_destino,
-        dados.valor,
-    )
-
-
-@router.post("/{endereco_origem}/transferencias")
-def transferir(
-    endereco_origem: str,
-    dados: Transferencia,
-    service: CarteiraService = Depends(get_carteira_service)
-):
-    return service.transferir(
-        endereco_origem,
-        dados.destino,
-        dados.valor,
-        dados.moeda,
-    )
+    try:
+        return service.bloquear(endereco_carteira)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
