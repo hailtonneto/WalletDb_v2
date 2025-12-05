@@ -16,6 +16,7 @@ CREATE USER IF NOT EXISTS 'wallet_api_homolog'@'%'
 
 -- 3) Grants: apenas DML (sem CREATE/DROP/ALTER)
 GRANT SELECT, INSERT, UPDATE, DELETE
+
     ON wallet_homolog.*
     TO 'wallet_api_homolog'@'%';
 
@@ -31,7 +32,7 @@ USE wallet_homolog;
 CREATE TABLE CARTEIRA (
     endereco_carteira VARCHAR(255) NOT NULL,
     hash_chave_privada VARCHAR(255) NOT NULL,
-    MODIFY data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status ENUM('ATIVA','BLOQUEADA') NOT NULL DEFAULT 'ATIVA',
     PRIMARY KEY (endereco_carteira)
 );
@@ -47,7 +48,7 @@ CREATE TABLE SALDO_CARTEIRA (
     endereco_carteira VARCHAR(255) NOT NULL,
     id_moeda SMALLINT NOT NULL,
     saldo DECIMAL(18, 8) NOT NULL default 0.0,
-    MODIFY data_atualizacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (endereco_carteira, id_moeda),
     FOREIGN KEY (endereco_carteira) REFERENCES CARTEIRA(endereco_carteira),
     FOREIGN KEY (id_moeda) REFERENCES MOEDA(id_moeda)

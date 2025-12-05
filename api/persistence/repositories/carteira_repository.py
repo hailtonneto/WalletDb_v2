@@ -11,7 +11,6 @@ from sqlalchemy import text
 from api.persistence.db import get_connection
 
 class CarteiraRepository:
-
     def criar(self) -> Dict[str, Any]:
         # ADIÇÃO MÍNIMA: defaults caso env não exista
         private_key_size:int = int(os.getenv("PRIVATE_KEY_SIZE", "32"))
@@ -235,7 +234,6 @@ class CarteiraRepository:
     
 
     def converter(self, endereco, id_moeda_origem, id_moeda_destino, valor_origem):
-        from decimal import Decimal
         valor_origem = Decimal(valor_origem)
 
         saldo_origem = self.obter_saldo(endereco, id_moeda_origem)
@@ -299,6 +297,9 @@ class CarteiraRepository:
     def transferir(self, endereco_origem, endereco_destino, id_moeda, valor, chave_privada):
         if not self.validar_chave(endereco_origem, chave_privada):
             raise ValueError("Chave privada inválida")
+        
+        if endereco_origem == endereco_destino:
+            raise ValueError("Endereço de origem e destino não podem ser iguais")
 
         valor = Decimal(valor)
         taxa_percentual = Decimal("0.02")
